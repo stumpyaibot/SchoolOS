@@ -122,7 +122,7 @@ function getAutoReply(userMessage: string): string {
   const msg = userMessage.toLowerCase();
   if (msg.includes('thank')) return 'You\'re welcome, Jack! 😊';
   if (msg.includes('permission') || msg.includes('consent')) return 'Great, I\'ll make sure to note that down. Thanks for confirming! 👍';
-  if (msg.includes('swim') || msg.includes('pe')) return 'No worries — I\'ll remind Leo about his PE kit on Thursday morning. 🏊';
-  if (msg.includes('art') || msg.includes('paint')) return 'Maya was so proud of her work today! I\'ll share more photos soon. 🎨';
+  if (msg.includes('swim') || msg.includes('pe')) return 'No worries — I\'ll remind George about his PE kit on Thursday morning. 🏊';
+  if (msg.includes('camp')) return 'Noted, Jack. I\'ll make sure Emma is all sorted for the camp arrangements. 👍';
   return `Thanks Jack, noted! I'll get back to you shortly. 👍`;
 }

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TeacherNav from '../../components/layout/TeacherNav';
-import { teacherConversations, teacherMessages, class4BStudents, getParentName } from '../../data/teacherMockData';
+import { teacherConversations, teacherMessages, classY6Students, getParentName } from '../../data/teacherMockData';
 import type { Message } from '../../types';
 
 export default function TeacherMessages() {
@@ -16,15 +16,15 @@ export default function TeacherMessages() {
   }, [localMessages, activeConv]);
 
   const activeConvData = teacherConversations.find(c => c.id === activeConv);
-  const activeStudent = activeConvData ? class4BStudents.find(s => s.id === activeConvData.studentId) : null;
-  const activeParentName = activeConvData ? getParentName(activeConvData.participantIds.find(id => id !== 'u_teacher_tan') || '') : '';
+  const activeStudent = activeConvData ? classY6Students.find(s => s.id === activeConvData.studentId) : null;
+  const activeParentName = activeConvData ? getParentName(activeConvData.participantIds.find(id => id !== 'u_teacher_tsoi') || '') : '';
 
   const handleSend = () => {
     if (!input.trim() || !activeConv) return;
     const newMsg: Message = {
       id: `tmsg_new_${Date.now()}`,
       conversationId: activeConv,
-      senderId: 'u_teacher_tan',
+      senderId: 'u_teacher_tsoi',
       content: input,
       timestamp: new Date().toISOString(),
       isRead: true,
@@ -50,8 +50,8 @@ export default function TeacherMessages() {
             </div>
             <div className="flex-1 overflow-y-auto">
               {teacherConversations.map((conv) => {
-                const student = class4BStudents.find(s => s.id === conv.studentId);
-                const parentId = conv.participantIds.find(id => id !== 'u_teacher_tan') || '';
+                const student = classY6Students.find(s => s.id === conv.studentId);
+                const parentId = conv.participantIds.find(id => id !== 'u_teacher_tsoi') || '';
                 const parentName = getParentName(parentId);
                 const isActive = activeConv === conv.id;
 
@@ -100,7 +100,7 @@ export default function TeacherMessages() {
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
                   {(localMessages[activeConv] || []).map((msg) => {
-                    const isMe = msg.senderId === 'u_teacher_tan';
+                    const isMe = msg.senderId === 'u_teacher_tsoi';
                     return (
                       <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                         <div

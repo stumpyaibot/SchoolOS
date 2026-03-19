@@ -1,13 +1,35 @@
 import { useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BackHeader from '../components/layout/BackHeader';
-import { feedItems, getUserById, getStudentById } from '../data/mockData';
-import type { Reaction } from '../types';
+import { getUserById, getStudentById } from '../data/mockData';
+import { getFeedItemById } from '../lib/dataAccess';
+import type { FeedItem, Reaction } from '../types';
 
 export default function PostDetail() {
   const { postId } = useParams<{ postId: string }>();
-  const item = feedItems.find(i => i.id === postId);
-  const [reactions, setReactions] = useState<Reaction[]>(item?.reactions || []);
+  const [item, setItem] = useState<FeedItem | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
+  const [reactions, setReactions] = useState<Reaction[]>([]);
+  const [showFull, setShowFull] = useState(false);
+
+  useEffect(() => {
+    if (postId) {
+      getFeedItemById(postId).then(found => {
+        setItem(found);
+        setReactions(found?.reactions || []);
+        setLoading(false);
+      });
+    }
+  }, [postId]);
+
+  if (loading) {
+    return (
+      <div>
+        <BackHeader title="Post" />
+        <div className="p-6 text-center text-gray-400">Loading…</div>
+      </div>
+    );
+  }
 
   if (!item) {
     return (
@@ -71,7 +93,39 @@ export default function PostDetail() {
           </div>
 
           <h2 className="text-[16px] font-bold text-gray-900 mb-1.5">{item.title}</h2>
-          <p className="text-[13px] text-gray-700 leading-relaxed whitespace-pre-wrap">{item.content}</p>
+
+          {/* Bullet Summary */}
+          {item.bulletSummary ? (
+            <>
+              <ul className="space-y-1.5 mb-3">
+                {item.bulletSummary.map((b, i) => (
+                  <li key={i} className="flex items-start gap-2 text-[13px] text-gray-700 leading-snug">
+                    <span className="text-blue-500 mt-0.5 shrink-0">•</span>
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Expandable Full Content */}
+              {item.fullContent && (
+                <>
+                  <button
+                    onClick={() => setShowFull(!showFull)}
+                    className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-[13px] font-semibold transition-all active:scale-[0.98]"
+                  >
+                    <span>{showFull ? '▲  Hide Full Newsletter' : '▼  Read Full Newsletter'}</span>
+                  </button>
+                  {showFull && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <p className="text-[13px] text-gray-700 leading-relaxed whitespace-pre-wrap">{item.fullContent}</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          ) : (
+            <p className="text-[13px] text-gray-700 leading-relaxed whitespace-pre-wrap">{item.content}</p>
+          )}
         </div>
 
         {/* Reactions */}

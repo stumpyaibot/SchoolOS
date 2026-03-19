@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import TeacherNav from '../../components/layout/TeacherNav';
-import { class4BStudents, getParentName } from '../../data/teacherMockData';
+import { classY6Students, getParentName } from '../../data/teacherMockData';
 
 type ResponseStatus = 'signed' | 'pending';
 
@@ -12,7 +12,7 @@ interface ParentResponse {
 }
 
 // Mock response data
-const mockResponses: ParentResponse[] = class4BStudents.map((student, i) => ({
+const mockResponses: ParentResponse[] = classY6Students.map((student, i) => ({
   parentId: student.parentIds[0],
   studentId: student.id,
   status: i < 4 ? 'signed' : 'pending',
@@ -87,7 +87,7 @@ export default function ResponseDashboard() {
           </p>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             {pending.map(r => {
-              const student = class4BStudents.find(s => s.id === r.studentId);
+              const student = classY6Students.find(s => s.id === r.studentId);
               return (
                 <div key={r.studentId} className="flex items-center gap-3 p-3">
                   <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 text-[12px] font-bold">
@@ -113,7 +113,7 @@ export default function ResponseDashboard() {
           </p>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             {signed.map(r => {
-              const student = class4BStudents.find(s => s.id === r.studentId);
+              const student = classY6Students.find(s => s.id === r.studentId);
               const timeAgo = r.respondedAt
                 ? `${Math.round((Date.now() - new Date(r.respondedAt).getTime()) / 3600000)}h ago`
                 : '';

@@ -24,48 +24,56 @@ export const currentUser: User = {
   id: 'u_parent_jack',
   role: 'parent',
   firstName: 'Jack',
-  lastName: 'Smith',
+  lastName: 'Turner',
   languagePreference: 'en',
-  childrenIds: ['stu_leo_1', 'stu_maya_2'],
+  childrenIds: ['stu_emma', 'stu_george'],
 };
 
 export const teachers: Record<string, User> = {
-  u_teacher_tan: {
-    id: 'u_teacher_tan',
+  u_teacher_tsoi: {
+    id: 'u_teacher_tsoi',
     role: 'teacher',
-    firstName: 'Mr.',
-    lastName: 'Tan',
+    firstName: 'Andrea',
+    lastName: 'Tsoi',
     languagePreference: 'en',
-    classIds: ['cls_4b'],
+    classIds: ['cls_y6_jaguars'],
   },
-  u_teacher_chen: {
-    id: 'u_teacher_chen',
+  u_teacher_lim: {
+    id: 'u_teacher_lim',
     role: 'teacher',
-    firstName: 'Ms.',
-    lastName: 'Chen',
+    firstName: 'Grace',
+    lastName: 'Lim',
     languagePreference: 'en',
-    classIds: ['cls_1a'],
+    classIds: ['cls_y4_penguins'],
   },
 };
 
 const adminUser: User = {
   id: 'u_admin',
   role: 'admin',
-  firstName: 'School',
-  lastName: 'Office',
+  firstName: 'EtonHouse',
+  lastName: 'Broadrick',
+  languagePreference: 'en',
+};
+
+const staffWendy: User = {
+  id: 'u_staff_wendy',
+  role: 'admin',
+  firstName: 'Wendy',
+  lastName: 'Tan',
   languagePreference: 'en',
 };
 
 /* ===== Students ===== */
 export const students: Student[] = [
-  { id: 'stu_leo_1', firstName: 'Leo', lastName: 'Smith', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_jack'] },
-  { id: 'stu_maya_2', firstName: 'Maya', lastName: 'Smith', gradeStr: 'Grade 1', classId: 'cls_1a', parentIds: ['u_parent_jack'] },
+  { id: 'stu_emma', firstName: 'Emma', lastName: 'Turner', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_jack', 'u_parent_saeko'] },
+  { id: 'stu_george', firstName: 'George', lastName: 'Turner', gradeStr: 'Year 4', classId: 'cls_y4_penguins', parentIds: ['u_parent_jack', 'u_parent_saeko'] },
 ];
 
 /* ===== Classes ===== */
 export const classes: Class[] = [
-  { id: 'cls_4b', name: '4B — Jaguars', teacherId: 'u_teacher_tan', studentIds: ['stu_leo_1'] },
-  { id: 'cls_1a', name: '1A — Butterflies', teacherId: 'u_teacher_chen', studentIds: ['stu_maya_2'] },
+  { id: 'cls_y6_jaguars', name: 'Y6 — Jaguars', teacherId: 'u_teacher_tsoi', studentIds: ['stu_emma'] },
+  { id: 'cls_y4_penguins', name: 'Y4 — Penguins', teacherId: 'u_teacher_lim', studentIds: ['stu_george'] },
 ];
 
 /* ===== AI Digest ===== */
@@ -74,106 +82,170 @@ export const todayDigest: AIDigest = {
   date: new Date().toISOString().slice(0, 10),
   generatedAt: todayAt(6, 30),
   items: [
-    { childId: 'stu_leo_1', icon: 'warning', summary: 'Science Museum permission slip due tomorrow.', sourcePostId: 'post_884' },
-    { childId: 'stu_leo_1', icon: 'logistics', summary: 'PE kit needed — swimming this Thursday.', sourcePostId: 'post_885' },
-    { childId: 'stu_maya_2', icon: 'info', summary: 'Art showcase photos shared by Ms. Chen.', sourcePostId: 'post_886' },
-    { childId: 'stu_maya_2', icon: 'logistics', summary: 'Book Week starts Monday — dress as favourite character.', sourcePostId: 'post_887' },
+    { icon: 'warning', summary: 'Hari Raya Dress-Up Day tomorrow — traditional or vibrant attire.', sourcePostId: 'post_raya' },
+    { icon: 'info', summary: 'No school on Friday (Hari Raya PH in lieu).', sourcePostId: 'post_raya' },
+    { childId: 'stu_emma', icon: 'logistics', summary: 'Y6 Camp next week — Emma not attending. Keep home Tuesday.', sourcePostId: 'post_camp' },
+    { childId: 'stu_george', icon: 'logistics', summary: 'Swimming on Thursday — goggles, cap, and towel needed.', sourcePostId: 'post_swim' },
   ],
 };
 
-/* ===== Feed Items — timestamps relative to today ===== */
+/* ===== Feed Items — from real emails ===== */
 export const feedItems: FeedItem[] = [
   {
-    id: 'post_884',
-    type: 'admin_announcement',
+    id: 'post_raya',
+    type: 'ingested_email',
     authorId: 'u_admin',
-    targetAudiences: { classIds: ['cls_4b'] },
+    targetAudiences: { schoolWide: true },
     timestamp: daysAgo(1),
-    title: 'Science Museum Trip — Permission Required',
-    content: 'Grade 4 will be visiting the Science Centre next week. Please review the details and sign the consent form by Wednesday.',
+    title: 'Hari Raya Dress-Up Day — Tomorrow 19 March',
+    summary: 'No Assembly • Traditional attire or vibrant outfits • No school Friday (PH in lieu)',
+    content: 'On this special day, there will be no Assembly, but we invite all students to don their traditional Hari Raya attire or vibrant outfits! Our school\'s Hari Raya PH in lieu is on 20th March (Friday) — there will be NO school that day.',
+    mediaUrls: ['/uploads/1773806602783_cdxf.png'],
+    priority: 'important',
+    reactions: [{type: '👍', count: 18, userReacted: true}],
+    readCount: 48,
+    totalAudience: 55,
+  },
+  {
+    id: 'post_pickup',
+    type: 'ingested_email',
+    authorId: 'u_teacher_tsoi',
+    targetAudiences: { classIds: ['cls_y6_jaguars'], studentIds: ['stu_emma'] },
+    timestamp: todayAt(10, 19),
+    title: 'Early Pick Up — Emma leaving at 2:30pm today',
+    content: 'Hi Ms Tsoi, PLO team — As with past Wednesdays, I\'ll pick Emma up at 2:30pm today. Also, as Emma will not join the Camp next week, and given that the rest of the class travels from Tuesday, I\'m assuming I should just keep her home on Tuesday?',
     priority: 'urgent',
-    readCount: 9,
-    totalAudience: 12,
-    actionItem: {
-      type: 'signature_required',
-      dueDate: daysFromNow(2),
-      isCompleted: false,
-      buttonLabel: 'Review & Sign',
-    },
-  },
-  {
-    id: 'post_885',
-    type: 'ingested_whatsapp',
-    authorId: 'u_teacher_tan',
-    targetAudiences: { classIds: ['cls_4b'] },
-    timestamp: daysAgo(0),
-    title: 'PE Reminder — Swimming Kit',
-    content: 'Hi parents! Just a quick reminder that Thursday is swimming. Please ensure your child brings goggles, swim cap, and a towel. Thanks!',
-    priority: 'normal',
-    reactions: [{type: '👍', count: 8, userReacted: true}],
-    readCount: 11,
-    totalAudience: 12,
-  },
-  {
-    id: 'post_886',
-    type: 'student_work',
-    authorId: 'u_teacher_chen',
-    targetAudiences: { studentIds: ['stu_maya_2'] },
-    timestamp: todayAt(10, 15),
-    title: 'Maya\'s Watercolour Masterpiece ✨',
-    content: 'Maya created this beautiful watercolour painting of a rainbow garden today. She was so proud of the colour blending!',
-    mediaUrls: ['/images/watercolour.jpg'],
-    priority: 'normal',
-    reactions: [{type: '❤️', count: 14, userReacted: true}, {type: '🌟', count: 7, userReacted: false}],
     readCount: 1,
     totalAudience: 1,
   },
   {
-    id: 'post_887',
+    id: 'post_withdrawal',
+    type: 'ingested_email',
+    authorId: 'u_staff_wendy',
+    targetAudiences: { studentIds: ['stu_emma'] },
+    timestamp: daysAgo(30),
+    title: 'Withdrawal Notice — Emma Turner (Y6 Jaguars)',
+    summary: 'Online form required — last day of school 17 June 2026',
+    content: 'Dear Jack and Saeko, as Emma will be completing Year 6 at EtonHouse Broadrick in June 2026, kindly complete the online withdrawal form below at your earliest convenience, indicating Emma\'s last day of school as 17 June 2026.',
+    priority: 'normal',
+    readCount: 1,
+    totalAudience: 1,
+    actionItem: {
+      type: 'signature_required',
+      dueDate: '2026-06-17',
+      isCompleted: false,
+      buttonLabel: 'Complete Form',
+    },
+  },
+  {
+    id: 'post_newsletter',
     type: 'ingested_email',
     authorId: 'u_admin',
     targetAudiences: { schoolWide: true },
-    timestamp: daysAgo(2),
-    title: 'Book Week — Dress Up Day',
-    content: 'Dear Parents, Book Week runs next week. On Friday, children are invited to dress as their favourite book character. No scary costumes please!',
-    priority: 'important',
-    readCount: 42,
+    timestamp: daysAgo(5),
+    title: 'Broadrick Principal\'s Newsletter — Term 3 Week 9',
+    content: 'Key highlights from the latest eNewsletter covering school events and important updates for AY 2025/2026.',
+    bulletSummary: [
+      'School Art Exhibition on 28 March — parents welcome from 2–4 pm.',
+      'Term 3 reports distributed to parents on 4 April.',
+      'Updated drop-off procedures start next Monday — use Gate B only.',
+      'Y5-Y6 inter-school sports day on 2 April at Kallang.',
+      'Canteen menu refresh: new healthy options from next week.',
+    ],
+    fullContent: `Dear Parents and Guardians,
+
+Welcome to the Term 3 Week 9 edition of the Broadrick Principal's Newsletter.
+
+School Art Exhibition
+We are delighted to invite you to our annual School Art Exhibition on Friday 28 March, from 2:00 pm to 4:00 pm. Students from all year groups have been working hard on their pieces, and we look forward to showcasing their creativity. Light refreshments will be provided.
+
+Term 3 Reports
+Term 3 academic reports will be distributed to parents on Friday 4 April. Please look out for these in your child's school bag. If you have any questions about the report, do reach out to your child's form teacher to arrange a conversation.
+
+Updated Drop-Off Procedures
+Starting Monday 24 March, all morning drop-offs should use Gate B (the side gate along Broadrick Road). Gate A will be reserved for bus arrivals only. This change is to improve pedestrian safety during peak hours. A map is attached for reference.
+
+Inter-School Sports Day
+Our Year 5 and Year 6 students will represent Broadrick at the inter-school sports day on Wednesday 2 April at the Kallang Sports Hub. Permission forms were sent home last week — please return them by 26 March if you haven't already. Go Broadrick!
+
+Canteen Menu Refresh
+We are excited to share that the school canteen will introduce a new range of healthy meal options from next week. The updated menu focuses on balanced nutrition while keeping the favourites your children love.
+
+Thank you for your continued support.
+
+Warm regards,
+Ms Rachel Tan
+Principal, EtonHouse Broadrick International School`,
+    priority: 'normal',
+    readCount: 35,
     totalAudience: 55,
+  },
+  {
+    id: 'post_camp',
+    type: 'admin_announcement',
+    authorId: 'u_teacher_tsoi',
+    targetAudiences: { classIds: ['cls_y6_jaguars'] },
+    timestamp: daysAgo(3),
+    title: 'Y6 Camp — Next Week (Tuesday-Thursday)',
+    summary: 'Check camp checklist is packed • No classes Tuesday if not attending',
+    content: 'Reminder: Y6 Camp is next week. The class travels from Tuesday. Please ensure your child has packed everything on the camp checklist. If your child is not attending, please keep them home on Tuesday as no classes will run.',
+    priority: 'important',
+    readCount: 10,
+    totalAudience: 12,
     actionItem: {
       type: 'acknowledgement',
-      dueDate: daysFromNow(7),
+      dueDate: daysFromNow(3),
       isCompleted: false,
       buttonLabel: 'Noted',
     },
   },
   {
-    id: 'post_888',
+    id: 'post_swim',
     type: 'teacher_post',
-    authorId: 'u_teacher_tan',
-    targetAudiences: { classIds: ['cls_4b'] },
-    timestamp: todayAt(14),
-    title: 'Creative Writing — Imaginary Planets',
-    content: 'Leo\'s class did an amazing job today imagining their own planets. Ask your child about the planet they created! Leo\'s planet has three suns and talking animals 🌍',
-    mediaUrls: ['/images/creative_writing.jpg'],
+    authorId: 'u_teacher_lim',
+    targetAudiences: { classIds: ['cls_y4_penguins'] },
+    timestamp: daysAgo(0),
+    title: 'Swimming Reminder — George\'s Class',
+    summary: 'Thursday — bring goggles, swim cap, and towel',
+    content: 'Hi parents! Swimming is on Thursday this week. Please make sure your child brings goggles, swim cap, and a towel. Thank you!',
     priority: 'normal',
-    reactions: [{type: '❤️', count: 12, userReacted: false}, {type: '👏', count: 5, userReacted: false}, {type: '🌟', count: 3, userReacted: false}],
-    readCount: 10,
+    reactions: [{type: '👍', count: 8, userReacted: true}],
+    readCount: 11,
     totalAudience: 12,
-  },
-  {
-    id: 'post_889',
-    type: 'admin_announcement',
-    authorId: 'u_admin',
-    targetAudiences: { schoolWide: true },
-    timestamp: daysAgo(3),
-    title: 'Term 4 Calendar Update',
-    content: 'Please note the updated dates for Term 4. School closes on 10 December for the holiday break. The first day of Term 1 (2027) is Monday 11 January.',
-    priority: 'normal',
   },
 ];
 
-/* ===== Calendar Events — relative to today ===== */
+/* ===== Calendar Events ===== */
 export const calendarEvents: CalendarEvent[] = [
+  {
+    id: 'evt_raya_dress',
+    title: 'Hari Raya Dress-Up Day',
+    description: 'All students invited to wear traditional Hari Raya attire or vibrant outfits. No assembly today.',
+    location: 'EtonHouse Broadrick',
+    startTime: daysFromNow(1),
+    endTime: (() => { const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(15); return d.toISOString(); })(),
+    isAllDay: false,
+    targetAudiences: { schoolWide: true },
+  },
+  {
+    id: 'evt_raya_ph',
+    title: 'Hari Raya PH in Lieu — NO SCHOOL',
+    description: 'School closed for Hari Raya public holiday in lieu.',
+    startTime: daysFromNow(2),
+    endTime: daysFromNow(2),
+    isAllDay: true,
+    targetAudiences: { schoolWide: true },
+  },
+  {
+    id: 'evt_y6_camp',
+    title: 'Y6 Camp',
+    description: 'Year 6 camp. Class travels from Tuesday. Check camp checklist.',
+    location: 'Outward Bound',
+    startTime: daysFromNow(4),
+    endTime: (() => { const d = new Date(); d.setDate(d.getDate() + 6); d.setHours(15); return d.toISOString(); })(),
+    isAllDay: false,
+    targetAudiences: { classIds: ['cls_y6_jaguars'] },
+  },
   {
     id: 'evt_swim',
     title: 'Swimming — PE',
@@ -182,77 +254,49 @@ export const calendarEvents: CalendarEvent[] = [
     startTime: daysFromNow(2),
     endTime: (() => { const d = new Date(); d.setDate(d.getDate() + 2); d.setHours(11); return d.toISOString(); })(),
     isAllDay: false,
-    targetAudiences: { classIds: ['cls_4b'] },
-  },
-  {
-    id: 'evt_museum',
-    title: 'Science Museum Trip',
-    description: 'Grade 4 excursion to the Science Centre Singapore.',
-    location: 'Science Centre, Jurong East',
-    startTime: daysFromNow(7),
-    endTime: (() => { const d = new Date(); d.setDate(d.getDate() + 7); d.setHours(14); return d.toISOString(); })(),
-    isAllDay: false,
-    targetAudiences: { classIds: ['cls_4b'] },
-  },
-  {
-    id: 'evt_bookweek',
-    title: 'Book Week',
-    description: 'A week of reading activities and dress-up day on Friday.',
-    startTime: daysFromNow(5),
-    endTime: daysFromNow(9),
-    isAllDay: true,
-    targetAudiences: { schoolWide: true },
+    targetAudiences: { classIds: ['cls_y4_penguins'] },
   },
   {
     id: 'evt_ptc',
     title: 'Parent-Teacher Conference',
-    description: 'Book a 15-minute slot with Mr. Tan to discuss Leo\'s progress.',
-    location: 'Room 4B, Main Building',
+    description: 'Book a 15-minute slot with Ms. Tsoi to discuss Emma\'s progress.',
+    location: 'Room Y6, Main Building',
     startTime: daysFromNow(14),
     endTime: (() => { const d = new Date(); d.setDate(d.getDate() + 14); d.setHours(16); return d.toISOString(); })(),
     isAllDay: false,
-    targetAudiences: { classIds: ['cls_4b'] },
-    bookingDetails: { isBookable: true, teacherId: 'u_teacher_tan' },
-  },
-  {
-    id: 'evt_sports',
-    title: 'Sports Day',
-    description: 'Annual inter-house sports competition. Parents welcome to attend!',
-    location: 'School Field',
-    startTime: daysFromNow(10),
-    endTime: daysFromNow(10),
-    isAllDay: true,
-    targetAudiences: { schoolWide: true },
+    targetAudiences: { classIds: ['cls_y6_jaguars'] },
+    bookingDetails: { isBookable: true, teacherId: 'u_teacher_tsoi' },
   },
 ];
 
 /* ===== Conversations & Messages ===== */
 export const conversations: Conversation[] = [
   {
-    id: 'conv_1',
-    participantIds: ['u_parent_jack', 'u_teacher_tan'],
-    studentId: 'stu_leo_1',
-    lastMessage: { id: 'msg_3', conversationId: 'conv_1', senderId: 'u_teacher_tan', content: 'Leo did really well in maths today — top of the class!', timestamp: todayAt(15, 30), isRead: false },
-    unreadCount: 1,
+    id: 'conv_emma',
+    participantIds: ['u_parent_jack', 'u_teacher_tsoi'],
+    studentId: 'stu_emma',
+    lastMessage: { id: 'msg_3', conversationId: 'conv_emma', senderId: 'u_parent_jack', content: 'Also, as Emma won\'t be joining Camp next week — should I keep her home on Tuesday?', timestamp: todayAt(10, 50), isRead: false },
+    unreadCount: 0,
   },
   {
-    id: 'conv_2',
-    participantIds: ['u_parent_jack', 'u_teacher_chen'],
-    studentId: 'stu_maya_2',
-    lastMessage: { id: 'msg_5', conversationId: 'conv_2', senderId: 'u_parent_jack', content: 'Thank you for the lovely photos of Maya\'s artwork!', timestamp: todayAt(11), isRead: true },
+    id: 'conv_george',
+    participantIds: ['u_parent_jack', 'u_teacher_lim'],
+    studentId: 'stu_george',
+    lastMessage: { id: 'msg_6', conversationId: 'conv_george', senderId: 'u_teacher_lim', content: 'It shows! He\'s one of the strongest swimmers in the class now. 🏊', timestamp: todayAt(8, 30), isRead: false },
     unreadCount: 0,
   },
 ];
 
 export const allMessages: Record<string, Message[]> = {
-  conv_1: [
-    { id: 'msg_1', conversationId: 'conv_1', senderId: 'u_parent_jack', content: 'Hi Mr. Tan, how is Leo doing in class this week?', timestamp: todayAt(9), isRead: true },
-    { id: 'msg_2', conversationId: 'conv_1', senderId: 'u_teacher_tan', content: 'Hi Jack! He\'s doing great. Very engaged in the creative writing topic.', timestamp: todayAt(12, 15), isRead: true },
-    { id: 'msg_3', conversationId: 'conv_1', senderId: 'u_teacher_tan', content: 'Leo did really well in maths today — top of the class!', timestamp: todayAt(15, 30), isRead: false },
+  conv_emma: [
+    { id: 'msg_1', conversationId: 'conv_emma', senderId: 'u_parent_jack', content: 'Hi Ms Tsoi, as with past Wednesdays, I\'ll pick Emma up at 2:30pm today.', timestamp: todayAt(10, 19), isRead: true },
+    { id: 'msg_2', conversationId: 'conv_emma', senderId: 'u_teacher_tsoi', content: 'Hi Jack, thanks for letting us know. Noted that Emma will leave at 2:30. Have a great day!', timestamp: todayAt(10, 45), isRead: true },
+    { id: 'msg_3', conversationId: 'conv_emma', senderId: 'u_parent_jack', content: 'Also, as Emma won\'t be joining Camp next week — should I keep her home on Tuesday?', timestamp: todayAt(10, 50), isRead: false },
   ],
-  conv_2: [
-    { id: 'msg_4', conversationId: 'conv_2', senderId: 'u_teacher_chen', content: 'Hi Jack! Just wanted to share that Maya had a wonderful day. She\'s really coming out of her shell in class.', timestamp: daysAgo(1), isRead: true },
-    { id: 'msg_5', conversationId: 'conv_2', senderId: 'u_parent_jack', content: 'Thank you for the lovely photos of Maya\'s artwork!', timestamp: todayAt(11), isRead: true },
+  conv_george: [
+    { id: 'msg_4', conversationId: 'conv_george', senderId: 'u_teacher_lim', content: 'Hi Jack! George did really well in swimming today — his backstroke is improving a lot!', timestamp: daysAgo(1), isRead: true },
+    { id: 'msg_5', conversationId: 'conv_george', senderId: 'u_parent_jack', content: 'That\'s great to hear! He\'s been practising on weekends too.', timestamp: daysAgo(1), isRead: true },
+    { id: 'msg_6', conversationId: 'conv_george', senderId: 'u_teacher_lim', content: 'It shows! He\'s one of the strongest swimmers in the class now. 🏊', timestamp: todayAt(8, 30), isRead: false },
   ],
 };
 
@@ -276,6 +320,7 @@ export const userSettings: UserSettings = {
 export function getUserById(id: string): User | undefined {
   if (id === currentUser.id) return currentUser;
   if (id === adminUser.id) return adminUser;
+  if (id === staffWendy.id) return staffWendy;
   return teachers[id];
 }
 

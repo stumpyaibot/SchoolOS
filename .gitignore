@@ -34,3 +34,8 @@ npm-debug.log*
 
 # Supabase local
 .supabase/
+
+# Server
+server/node_modules/
+server/schoolos.db
+server/.env

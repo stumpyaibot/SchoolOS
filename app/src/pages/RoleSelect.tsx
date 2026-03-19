@@ -14,16 +14,16 @@ export default function RoleSelect() {
 
         {/* Role Cards */}
         <div className="space-y-3">
-          <button
+           <button
             onClick={() => navigate('/home')}
             className="w-full bg-white rounded-xl border border-gray-200 p-5 flex items-center gap-4 text-left hover:shadow-md transition-all active:scale-[0.98]"
           >
             <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white text-[18px] font-bold shrink-0">
-              J
+              JT
             </div>
             <div className="flex-1">
-              <p className="text-[16px] font-bold text-gray-900">Jack Smith</p>
-              <p className="text-[12px] text-gray-500">Parent — Leo (4B) & Maya (1A)</p>
+              <p className="text-[16px] font-bold text-gray-900">Jack Turner</p>
+              <p className="text-[12px] text-gray-500">Parent — Emma (Y6) & George (Y4)</p>
             </div>
             <span className="text-gray-300 text-xl">›</span>
           </button>
@@ -33,11 +33,11 @@ export default function RoleSelect() {
             className="w-full bg-white rounded-xl border border-gray-200 p-5 flex items-center gap-4 text-left hover:shadow-md transition-all active:scale-[0.98]"
           >
             <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-white text-[18px] font-bold shrink-0">
-              MT
+              AT
             </div>
             <div className="flex-1">
-              <p className="text-[16px] font-bold text-gray-900">Mr. Tan</p>
-              <p className="text-[12px] text-gray-500">Teacher — Class 4B Jaguars</p>
+              <p className="text-[16px] font-bold text-gray-900">Ms. Tsoi</p>
+              <p className="text-[12px] text-gray-500">Teacher — Y6 Jaguars</p>
             </div>
             <span className="text-gray-300 text-xl">›</span>
           </button>

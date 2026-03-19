@@ -40,15 +40,15 @@ function generateAIResponse(query: string): { text: string; deepLink?: string } 
   }
 
   // --- Pattern: specific child questions ---
-  const askingAboutMaya = q.includes('maya');
-  const askingAboutLeo = q.includes('leo');
+  const askingAboutGeorge = q.includes('george');
+  const askingAboutEmma = q.includes('emma');
 
-  if (askingAboutMaya || askingAboutLeo) {
-    const childName = askingAboutMaya ? 'Maya' : 'Leo';
-    const childId = askingAboutMaya ? 'stu_maya_2' : 'stu_leo_1';
+  if (askingAboutGeorge || askingAboutEmma) {
+    const childName = askingAboutGeorge ? 'George' : 'Emma';
+    const childId = askingAboutGeorge ? 'stu_george' : 'stu_emma';
     const childPosts = feedItems.filter(item =>
       item.targetAudiences.studentIds?.includes(childId) ||
-      (item.targetAudiences.classIds?.includes(askingAboutMaya ? 'cls_1a' : 'cls_4b'))
+      (item.targetAudiences.classIds?.includes(askingAboutGeorge ? 'cls_y4_penguins' : 'cls_y6_jaguars'))
     );
 
     if (childPosts.length > 0) {
@@ -155,7 +155,7 @@ function generateAIResponse(query: string): { text: string; deepLink?: string } 
 
   // --- Fallback ---
   return {
-    text: "I'm not sure about that. I can help with questions about your children's school updates, upcoming events, pending action items, or specific topics like swimming, book week, or the science museum trip. Try asking something like:\n\n• \"What do I need to action this week?\"\n• \"Tell me about swimming\"\n• \"When is the parent-teacher conference?\"\n• \"What did Maya do today?\"",
+    text: "I'm not sure about that. I can help with questions about your children's school updates, upcoming events, pending action items, or specific topics like swimming, Hari Raya, or the Y6 camp. Try asking something like:\n\n• \"What do I need to action this week?\"\n• \"Tell me about swimming\"\n• \"When is the parent-teacher conference?\"\n• \"What's happening with Emma?\"",
   };
 }
 
@@ -175,7 +175,7 @@ function renderMarkdown(text: string) {
 export default function AIAssistant() {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string; deepLink?: string }[]>([
-    { role: 'ai', text: 'Good morning, Jack! 👋 I\'m your SchoolOS assistant. I know everything about Leo and Maya\'s school life — updates, events, action items, and more. Ask me anything!' },
+    { role: 'ai', text: 'Good morning, Jack! 👋 I\'m your SchoolOS assistant. I know everything about Emma and George\'s school life at EtonHouse Broadrick — updates, events, action items, and more. Ask me anything!' },
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -188,7 +188,7 @@ export default function AIAssistant() {
   const suggestions = [
     'What do I need to action this week?',
     'Tell me about swimming',
-    'What did Maya do today?',
+    "What's happening with Emma?",
     'When is the parent-teacher conference?',
     "What's coming up this month?",
   ];

@@ -13,68 +13,68 @@ function todayAt(hour: number, minute = 0): string {
   return d.toISOString();
 }
 
-/* ===== Expanded Class Roster for 4B ===== */
-export const class4BStudents: Student[] = [
-  { id: 'stu_leo_1', firstName: 'Leo', lastName: 'Smith', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_jack'] },
-  { id: 'stu_ethan_3', firstName: 'Ethan', lastName: 'Lim', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_lim'] },
-  { id: 'stu_chloe_4', firstName: 'Chloe', lastName: 'Tan', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_tan_p'] },
-  { id: 'stu_aiden_5', firstName: 'Aiden', lastName: 'Wong', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_wong'] },
-  { id: 'stu_sophia_6', firstName: 'Sophia', lastName: 'Chen', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_chen_p'] },
-  { id: 'stu_ryan_7', firstName: 'Ryan', lastName: 'Ng', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_ng'] },
-  { id: 'stu_emma_8', firstName: 'Emma', lastName: 'Lee', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_lee'] },
-  { id: 'stu_jayden_9', firstName: 'Jayden', lastName: 'Ong', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_ong'] },
-  { id: 'stu_hana_10', firstName: 'Hana', lastName: 'Sato', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_sato'] },
-  { id: 'stu_lucas_11', firstName: 'Lucas', lastName: 'Kumar', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_kumar'] },
-  { id: 'stu_olivia_12', firstName: 'Olivia', lastName: 'Goh', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_goh'] },
-  { id: 'stu_noah_13', firstName: 'Noah', lastName: 'Teo', gradeStr: 'Grade 4', classId: 'cls_4b', parentIds: ['u_parent_teo'] },
+/* ===== Expanded Class Roster for Y6 Jaguars ===== */
+export const classY6Students: Student[] = [
+  { id: 'stu_emma', firstName: 'Emma', lastName: 'Turner', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_jack', 'u_parent_saeko'] },
+  { id: 'stu_ethan_3', firstName: 'Ethan', lastName: 'Lim', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_lim'] },
+  { id: 'stu_chloe_4', firstName: 'Chloe', lastName: 'Tan', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_tan_p'] },
+  { id: 'stu_aiden_5', firstName: 'Aiden', lastName: 'Wong', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_wong'] },
+  { id: 'stu_sophia_6', firstName: 'Sophia', lastName: 'Chen', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_chen_p'] },
+  { id: 'stu_ryan_7', firstName: 'Ryan', lastName: 'Ng', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_ng'] },
+  { id: 'stu_lily_8', firstName: 'Lily', lastName: 'Lee', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_lee'] },
+  { id: 'stu_jayden_9', firstName: 'Jayden', lastName: 'Ong', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_ong'] },
+  { id: 'stu_hana_10', firstName: 'Hana', lastName: 'Sato', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_sato'] },
+  { id: 'stu_lucas_11', firstName: 'Lucas', lastName: 'Kumar', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_kumar'] },
+  { id: 'stu_olivia_12', firstName: 'Olivia', lastName: 'Goh', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_goh'] },
+  { id: 'stu_noah_13', firstName: 'Noah', lastName: 'Teo', gradeStr: 'Year 6', classId: 'cls_y6_jaguars', parentIds: ['u_parent_teo'] },
 ];
 
-/* ===== Current Teacher (Mr. Tan) ===== */
+/* ===== Current Teacher (Ms. Tsoi) ===== */
 export const currentTeacher: User = {
-  id: 'u_teacher_tan',
+  id: 'u_teacher_tsoi',
   role: 'teacher',
-  firstName: 'Mr.',
-  lastName: 'Tan',
+  firstName: 'Andrea',
+  lastName: 'Tsoi',
   languagePreference: 'en',
-  classIds: ['cls_4b'],
+  classIds: ['cls_y6_jaguars'],
 };
 
 /* ===== Teacher Conversations — relative timestamps ===== */
 export const teacherConversations: Conversation[] = [
   {
-    id: 'conv_1',
-    participantIds: ['u_teacher_tan', 'u_parent_jack'],
-    studentId: 'stu_leo_1',
-    lastMessage: { id: 'msg_3', conversationId: 'conv_1', senderId: 'u_parent_jack', content: 'Thanks for the update on Leo!', timestamp: todayAt(15, 30), isRead: false },
+    id: 'conv_emma',
+    participantIds: ['u_teacher_tsoi', 'u_parent_jack'],
+    studentId: 'stu_emma',
+    lastMessage: { id: 'msg_3', conversationId: 'conv_emma', senderId: 'u_parent_jack', content: 'Also, as Emma won\'t be joining Camp next week — should I keep her home on Tuesday?', timestamp: todayAt(10, 50), isRead: false },
     unreadCount: 1,
   },
   {
     id: 'tconv_2',
-    participantIds: ['u_teacher_tan', 'u_parent_lim'],
+    participantIds: ['u_teacher_tsoi', 'u_parent_lim'],
     studentId: 'stu_ethan_3',
     lastMessage: { id: 'tmsg_1', conversationId: 'tconv_2', senderId: 'u_parent_lim', content: 'Ethan will be absent tomorrow — doctor appointment.', timestamp: todayAt(14), isRead: false },
     unreadCount: 1,
   },
   {
     id: 'tconv_3',
-    participantIds: ['u_teacher_tan', 'u_parent_wong'],
+    participantIds: ['u_teacher_tsoi', 'u_parent_wong'],
     studentId: 'stu_aiden_5',
-    lastMessage: { id: 'tmsg_2', conversationId: 'tconv_3', senderId: 'u_teacher_tan', content: 'Aiden did a fantastic presentation today!', timestamp: todayAt(10, 15), isRead: true },
+    lastMessage: { id: 'tmsg_2', conversationId: 'tconv_3', senderId: 'u_teacher_tsoi', content: 'Aiden did a fantastic presentation today!', timestamp: todayAt(10, 15), isRead: true },
     unreadCount: 0,
   },
 ];
 
 export const teacherMessages: Record<string, Message[]> = {
-  conv_1: [
-    { id: 'msg_1', conversationId: 'conv_1', senderId: 'u_parent_jack', content: 'Hi Mr. Tan, how is Leo doing in class this week?', timestamp: todayAt(9), isRead: true },
-    { id: 'msg_2', conversationId: 'conv_1', senderId: 'u_teacher_tan', content: 'Hi Jack! He\'s doing great. Very engaged in the creative writing topic.', timestamp: todayAt(12, 15), isRead: true },
-    { id: 'msg_3', conversationId: 'conv_1', senderId: 'u_parent_jack', content: 'Thanks for the update on Leo!', timestamp: todayAt(15, 30), isRead: false },
+  conv_emma: [
+    { id: 'msg_1', conversationId: 'conv_emma', senderId: 'u_parent_jack', content: 'Hi Ms Tsoi, as with past Wednesdays, I\'ll pick Emma up at 2:30pm today.', timestamp: todayAt(10, 19), isRead: true },
+    { id: 'msg_2', conversationId: 'conv_emma', senderId: 'u_teacher_tsoi', content: 'Hi Jack, thanks for letting us know. Noted that Emma will leave at 2:30. Have a great day!', timestamp: todayAt(10, 45), isRead: true },
+    { id: 'msg_3', conversationId: 'conv_emma', senderId: 'u_parent_jack', content: 'Also, as Emma won\'t be joining Camp next week — should I keep her home on Tuesday?', timestamp: todayAt(10, 50), isRead: false },
   ],
   tconv_2: [
     { id: 'tmsg_1', conversationId: 'tconv_2', senderId: 'u_parent_lim', content: 'Ethan will be absent tomorrow — doctor appointment.', timestamp: todayAt(14), isRead: false },
   ],
   tconv_3: [
-    { id: 'tmsg_2', conversationId: 'tconv_3', senderId: 'u_teacher_tan', content: 'Aiden did a fantastic presentation today!', timestamp: todayAt(10, 15), isRead: true },
+    { id: 'tmsg_2', conversationId: 'tconv_3', senderId: 'u_teacher_tsoi', content: 'Aiden did a fantastic presentation today!', timestamp: todayAt(10, 15), isRead: true },
     { id: 'tmsg_3', conversationId: 'tconv_3', senderId: 'u_parent_wong', content: 'That\'s wonderful to hear! Thank you.', timestamp: todayAt(11), isRead: true },
   ],
 };
@@ -83,36 +83,34 @@ export const teacherMessages: Record<string, Message[]> = {
 export const teacherRecentPosts = [
   {
     id: 'tp_1',
-    type: 'student_work' as const,
-    studentId: 'stu_leo_1',
-    title: 'Leo\'s Creative Writing — Imaginary Planets',
-    content: 'Leo created an incredible story about a planet with three suns and talking animals! 🌍',
-    timestamp: todayAt(14),
-    mediaUrl: '/images/creative_writing.jpg',
+    type: 'admin_announcement' as const,
+    title: 'Y6 Camp — Next Week (Tuesday-Thursday)',
+    content: 'Reminder: Y6 Camp is next week. Class travels from Tuesday. Please ensure camp checklists are complete.',
+    timestamp: daysAgo(3),
     readCount: 10,
-    totalAudience: 12,
-    reactions: 17,
-  },
-  {
-    id: 'tp_2',
-    type: 'class_update' as const,
-    title: 'Class 4B — Swimming Reminder',
-    content: 'Reminder: Swimming is this Thursday. Please bring goggles, swim cap, and towel.',
-    timestamp: daysAgo(0),
-    readCount: 11,
     totalAudience: 12,
     reactions: 8,
   },
   {
-    id: 'tp_3',
+    id: 'tp_2',
     type: 'student_work' as const,
-    studentId: 'stu_chloe_4',
-    title: 'Chloe\'s Maths Challenge — Perfect Score!',
-    content: 'Chloe got full marks on the fractions challenge today. Really impressive work! 🌟',
+    studentId: 'stu_sophia_6',
+    title: 'Sophia\'s Science Presentation — Outstanding!',
+    content: 'Sophia gave an excellent presentation on climate change today. Really impressive research! 🌟',
     timestamp: daysAgo(1),
     readCount: 1,
     totalAudience: 1,
     reactions: 4,
+  },
+  {
+    id: 'tp_3',
+    type: 'class_update' as const,
+    title: 'Early Pickup — Emma Turner',
+    content: 'Emma will be picked up at 2:30pm today. Noted by parent.',
+    timestamp: todayAt(10, 19),
+    readCount: 1,
+    totalAudience: 1,
+    reactions: 0,
   },
 ];
 
@@ -126,7 +124,8 @@ export const teacherPendingActions = {
 
 /* ===== Helper: Get parent name for student ===== */
 const parentNames: Record<string, string> = {
-  u_parent_jack: 'Jack Smith',
+  u_parent_jack: 'Jack Turner',
+  u_parent_saeko: 'Saeko Turner',
   u_parent_lim: 'Sarah Lim',
   u_parent_tan_p: 'David Tan',
   u_parent_wong: 'Michelle Wong',
@@ -145,5 +144,5 @@ export function getParentName(parentId: string): string {
 }
 
 export function getStudentById(id: string): Student | undefined {
-  return class4BStudents.find(s => s.id === id);
+  return classY6Students.find(s => s.id === id);
 }

@@ -50,6 +50,9 @@ export interface FeedItem {
   timestamp: string;
   title: string;
   content: string;
+  summary?: string;
+  bulletSummary?: string[];
+  fullContent?: string;
   mediaUrls?: string[];
   priority: Priority;
   reactions?: Reaction[];
@@ -107,7 +110,7 @@ export interface AIDigest {
 }
 
 export interface DigestItem {
-  childId: string;
+  childId?: string;
   icon: 'info' | 'warning' | 'logistics';
   summary: string;
   sourcePostId?: string;

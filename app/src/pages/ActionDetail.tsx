@@ -1,15 +1,26 @@
 import { useParams } from 'react-router-dom';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import BackHeader from '../components/layout/BackHeader';
 import Toast from '../components/ui/Toast';
-import { feedItems } from '../data/mockData';
+import { getFeedItemById } from '../lib/dataAccess';
+import type { FeedItem } from '../types';
 
 export default function ActionDetail() {
   const { itemId } = useParams<{ itemId: string }>();
-  const item = feedItems.find(i => i.id === itemId);
+  const [item, setItem] = useState<FeedItem | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
   const [checklist, setChecklist] = useState([false, false, false]);
   const [submitted, setSubmitted] = useState(false);
   const [toast, setToast] = useState('');
+
+  useEffect(() => {
+    if (itemId) {
+      getFeedItemById(itemId).then(found => {
+        setItem(found);
+        setLoading(false);
+      });
+    }
+  }, [itemId]);
 
   const dismissToast = useCallback(() => setToast(''), []);
 

@@ -1,11 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import TeacherNav from '../../components/layout/TeacherNav';
-import { class4BStudents, getParentName, teacherRecentPosts } from '../../data/teacherMockData';
+import { classY6Students, getParentName, teacherRecentPosts } from '../../data/teacherMockData';
 
 export default function StudentProfile() {
   const { studentId } = useParams<{ studentId: string }>();
   const navigate = useNavigate();
-  const student = class4BStudents.find(s => s.id === studentId);
+  const student = classY6Students.find(s => s.id === studentId);
 
   if (!student) {
     return (
@@ -39,7 +39,7 @@ export default function StudentProfile() {
           </div>
           <div className="flex-1">
             <h2 className="text-[18px] font-bold text-gray-900">{student.firstName} {student.lastName}</h2>
-            <p className="text-[13px] text-gray-500">{student.gradeStr} · 4B Jaguars</p>
+            <p className="text-[13px] text-gray-500">{student.gradeStr} · Y6 Jaguars</p>
             <p className="text-[12px] text-gray-400 mt-1">Parent: {parentName}</p>
           </div>
           <div className="flex gap-2">

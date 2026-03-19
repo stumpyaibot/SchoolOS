@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 
 interface HeaderProps {
   title: string;
@@ -17,11 +18,11 @@ export default function Header({ title, subtitle }: HeaderProps) {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => navigate('/search')}
-            className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[14px] text-gray-500 hover:bg-gray-200 transition-colors active:scale-95"
-            aria-label="Search"
+            onClick={() => navigate('/ai')}
+            className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 hover:bg-blue-100 transition-colors active:scale-95"
+            aria-label="AI Assistant"
           >
-            🔍
+            <Sparkles size={14} strokeWidth={2} />
           </button>
           <button
             onClick={() => navigate('/settings')}

@@ -1,8 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
-import { feedItems, todayDigest, students, getUserById, getStudentById } from '../data/mockData';
+import { students, getUserById, getStudentById, getClassById } from '../data/mockData';
+import { getFeedItems, getTodayDigest } from '../lib/dataAccess';
 import type { FeedItem } from '../types';
+
+/* ===== Helper: which child does this item belong to? ===== */
+function getChildIdForItem(item: FeedItem): string | null {
+  if (item.targetAudiences.studentIds) {
+    return item.targetAudiences.studentIds[0];
+  }
+  if (item.targetAudiences.classIds) {
+    const child = students.find(s => s.classId === item.targetAudiences.classIds![0]);
+    return child?.id ?? null;
+  }
+  return null; // school-wide
+}
+
+/* ===== Child color system ===== */
+function childColor(childId: string | null): { text: string; bg: string; border: string; dot: string } {
+  if (childId === 'stu_emma') return { text: 'text-teal-700', bg: 'bg-teal-50', border: 'border-teal-300', dot: 'bg-teal-500' };
+  if (childId === 'stu_george') return { text: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-300', dot: 'bg-amber-500' };
+  return { text: 'text-gray-500', bg: 'bg-gray-50', border: 'border-gray-300', dot: 'bg-gray-400' };
+}
 
 function typeLabel(item: FeedItem): string {
   switch (item.type) {
@@ -24,16 +44,6 @@ function typeIcon(item: FeedItem): string {
   }
 }
 
-function iconBg(item: FeedItem): string {
-  switch (item.type) {
-    case 'ingested_whatsapp': return 'bg-green-100';
-    case 'ingested_email': return 'bg-gray-100';
-    case 'student_work': return 'bg-purple-100';
-    case 'admin_announcement': return 'bg-orange-100';
-    default: return 'bg-blue-100';
-  }
-}
-
 function timeAgo(timestamp: string): string {
   const diff = Date.now() - new Date(timestamp).getTime();
   const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -43,7 +53,7 @@ function timeAgo(timestamp: string): string {
   return `${days}d ago`;
 }
 
-function childTag(item: FeedItem): string {
+function childTagLabel(item: FeedItem): string {
   if (item.targetAudiences.schoolWide) return 'WHOLE SCHOOL';
   if (item.targetAudiences.studentIds) {
     const s = getStudentById(item.targetAudiences.studentIds[0]);
@@ -51,7 +61,10 @@ function childTag(item: FeedItem): string {
   }
   if (item.targetAudiences.classIds) {
     const classId = item.targetAudiences.classIds[0];
-    return classId === 'cls_4b' ? 'LEO • GRADE 4' : 'MAYA • GRADE 1';
+    const child = students.find(s => s.classId === classId);
+    if (child) return `${child.firstName.toUpperCase()} • ${child.gradeStr.toUpperCase()}`;
+    const cls = getClassById(classId);
+    return cls ? cls.name.toUpperCase() : '';
   }
   return '';
 }
@@ -59,20 +72,29 @@ function childTag(item: FeedItem): string {
 function isItemForChild(item: FeedItem, childId: string): boolean {
   const student = students.find(s => s.id === childId);
   if (!student) return false;
-  // Item directly targets this student
   if (item.targetAudiences.studentIds?.includes(childId)) return true;
-  // Item targets this student's class
   if (item.targetAudiences.classIds?.includes(student.classId)) return true;
-  // School-wide items are always shown
-  if (item.targetAudiences.schoolWide) return true;
   return false;
 }
 
 export default function HomeFeed() {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const urgentItems = feedItems.filter(i => i.priority === 'urgent');
+  // Fetch feed items from API (with mock fallback)
+  useEffect(() => {
+    getFeedItems().then(items => {
+      setFeedItems(items);
+      setLoading(false);
+    });
+  }, []);
+
+  // Digest still from mock (will be AI-generated later)
+  const todayDigest = getTodayDigest();
+
+  const urgentItems = feedItems.filter(i => i.priority === 'urgent' && i.actionItem);
   const sortedFeed = [...feedItems]
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .filter(item => activeFilter === 'all' || isItemForChild(item, activeFilter));
@@ -85,7 +107,7 @@ export default function HomeFeed() {
     <div className="pb-16">
       <Header title="SchoolOS" />
 
-      <div className="px-2.5 pt-2 space-y-2">
+      <div className="px-2.5 pt-2 space-y-3">
         {/* Urgent Banner */}
         {urgentItems
           .filter(item => activeFilter === 'all' || isItemForChild(item, activeFilter))
@@ -107,24 +129,25 @@ export default function HomeFeed() {
           </button>
         ))}
 
-        {/* AI Digest Card */}
+        {/* ===== Morning Digest ===== */}
         {filteredDigest.length > 0 && (
           <button
             onClick={() => navigate('/ai')}
-            className="w-full bg-white rounded-lg border border-gray-200 p-2.5 text-left transition-transform active:scale-[0.98]"
+            className="w-full bg-white rounded-lg border border-gray-200 p-3 text-left transition-transform active:scale-[0.98]"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">MORNING DIGEST • AI</span>
+              <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Morning Digest • AI</span>
               <span className="text-[11px] text-gray-400">Today</span>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {filteredDigest.map((d, i) => {
-                const child = getStudentById(d.childId);
+                const child = d.childId ? getStudentById(d.childId) : null;
+                const colors = childColor(d.childId ?? null);
                 return (
-                  <div key={i} className="flex items-center gap-1.5">
-                    <span className="text-xs">{d.icon === 'warning' ? '🔴' : d.icon === 'logistics' ? '📋' : 'ℹ️'}</span>
-                    <p className="text-[12px] text-gray-700 leading-snug">
-                      <span className="font-bold text-gray-400 uppercase text-[10px]">{child?.firstName}</span>
+                  <div key={i} className="flex items-start gap-2">
+                    <span className={`w-2 h-2 rounded-full ${colors.dot} mt-1.5 shrink-0`} />
+                    <p className="text-[13px] text-gray-700 leading-snug">
+                      <span className={`font-semibold uppercase text-[10px] ${colors.text}`}>{child?.firstName ?? 'ALL'}</span>
                       <span className="text-gray-300 mx-1">·</span>
                       {d.summary}
                     </p>
@@ -135,7 +158,7 @@ export default function HomeFeed() {
           </button>
         )}
 
-        {/* Child Filter Chips */}
+        {/* ===== Child Filter Chips ===== */}
         <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
           <button
             onClick={() => setActiveFilter('all')}
@@ -147,25 +170,32 @@ export default function HomeFeed() {
           >
             All Children
           </button>
-          {students.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setActiveFilter(s.id)}
-              className={`rounded-full px-4 py-1.5 text-[13px] font-medium whitespace-nowrap shrink-0 transition-colors ${
-                activeFilter === s.id
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white border border-gray-300 text-gray-700'
-              }`}
-            >
-              {s.firstName} — {s.gradeStr}
-            </button>
-          ))}
+          {students.map((s) => {
+            const colors = childColor(s.id);
+            const isActive = activeFilter === s.id;
+            return (
+              <button
+                key={s.id}
+                onClick={() => setActiveFilter(s.id)}
+                className={`rounded-full px-4 py-1.5 text-[13px] font-medium whitespace-nowrap shrink-0 transition-colors border ${
+                  isActive
+                    ? `${colors.bg} ${colors.border} ${colors.text}`
+                    : `bg-white ${colors.border} ${colors.text}`
+                }`}
+                style={{ opacity: isActive ? 1 : 0.7 }}
+              >
+                {s.firstName} — {s.gradeStr}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Feed Cards */}
+        {/* ===== Feed Cards ===== */}
         {sortedFeed.map((item) => {
           const author = getUserById(item.authorId);
           const route = item.actionItem ? `/action/${item.id}` : `/post/${item.id}`;
+          const itemChildId = getChildIdForItem(item);
+          const colors = childColor(itemChildId);
 
           return (
             <button
@@ -173,57 +203,73 @@ export default function HomeFeed() {
               onClick={() => navigate(route)}
               className="w-full bg-white rounded-lg border border-gray-200 text-left block transition-transform active:scale-[0.98]"
             >
-              {/* Card Header */}
+              {/* Card Header — Pill Badges */}
               <div className="px-2.5 pt-2.5 pb-0.5 flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <span className={`w-6 h-6 rounded-lg ${iconBg(item)} flex items-center justify-center text-xs`}>{typeIcon(item)}</span>
-                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    {typeLabel(item)} • {childTag(item)}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {/* Source type pill */}
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-[9px] font-bold text-gray-500 uppercase tracking-wide">
+                    {typeIcon(item)} {typeLabel(item)}
+                  </span>
+                  {/* Child/audience pill */}
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${colors.bg} border ${colors.border} text-[9px] font-bold ${colors.text} uppercase tracking-wide`}>
+                    {childTagLabel(item)}
                   </span>
                 </div>
-                <span className="text-[11px] text-gray-400">{timeAgo(item.timestamp)}</span>
+                <span className="text-[11px] text-gray-400 shrink-0 ml-2">{timeAgo(item.timestamp)}</span>
               </div>
 
               {/* Card Body */}
               <div className="px-2.5 pb-2.5">
-                <h3 className="text-[14px] font-semibold text-gray-900 mb-1">{item.title}</h3>
-                <p className="text-[12px] text-gray-500 leading-snug line-clamp-2">{item.content}</p>
+                <h3 className="text-[14px] font-semibold text-gray-900 mb-0.5">{item.title}</h3>
+                {item.bulletSummary ? (
+                  <ul className="space-y-0.5">
+                    {item.bulletSummary.slice(0, 3).map((b, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-[12px] text-gray-600 leading-snug">
+                        <span className="text-blue-400 mt-px shrink-0">•</span>
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                    {item.bulletSummary.length > 3 && (
+                      <li className="text-[11px] text-blue-600 font-medium pl-4">+{item.bulletSummary.length - 3} more…</li>
+                    )}
+                  </ul>
+                ) : item.summary ? (
+                  <p className="text-[12px] text-gray-500 leading-snug">{item.summary}</p>
+                ) : null}
 
-                {/* Media Preview */}
+                {/* Media Preview — 16:9 aspect ratio */}
                 {item.mediaUrls && item.mediaUrls.length > 0 && (
-                  <div className="mt-2 rounded-lg overflow-hidden">
-                    <img src={item.mediaUrls[0]} alt="" className="w-full h-28 object-cover" />
+                  <div className="mt-2 rounded-lg overflow-hidden" style={{ aspectRatio: '16/9' }}>
+                    <img src={item.mediaUrls[0]} alt="" className="w-full h-full object-cover" />
                   </div>
                 )}
 
-                {/* Action Button */}
-                {item.actionItem && !item.actionItem.isCompleted && (
-                  <div className="mt-2 flex justify-end">
-                    <span className="bg-blue-600 text-white rounded-lg px-4 py-1.5 text-[12px] font-bold">
+                {/* Action Button — only for real actions (not acknowledgements) */}
+                {item.actionItem && !item.actionItem.isCompleted && item.actionItem.type !== 'acknowledgement' && (
+                  <div className="mt-2">
+                    <span className="block w-full text-center bg-blue-600 text-white rounded-lg py-2 text-[13px] font-bold">
                       {item.actionItem.buttonLabel}
                     </span>
                   </div>
                 )}
 
-                {/* Reactions */}
-                {item.reactions && item.reactions.length > 0 && (
-                  <div className="mt-2 flex gap-2">
-                    {item.reactions.map((r, i) => (
+                {/* Reactions + Author — single row */}
+                <div className="mt-2 flex items-center justify-between">
+                  <div className="flex gap-2">
+                    {item.reactions && item.reactions.map((r, i) => (
                       <span key={i} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${r.userReacted ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-gray-50 text-gray-600 border border-gray-200'}`}>
                         {r.type} {r.count}
                       </span>
                     ))}
                   </div>
-                )}
-
-                {/* Author line */}
-                <div className="mt-2 flex items-center gap-1.5">
-                  <span className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[9px] font-bold text-gray-600">
-                    {author ? author.firstName[0] + author.lastName[0] : '?'}
-                  </span>
-                  <span className="text-[11px] text-gray-400">
-                    {author ? `${author.firstName} ${author.lastName}` : 'SchoolOS'}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-[8px] font-bold text-gray-500">
+                      {author ? author.firstName[0] + author.lastName[0] : '?'}
+                    </span>
+                    <span className="text-[10px] text-gray-400">
+                      {author ? `${author.firstName} ${author.lastName}` : 'SchoolOS'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </button>

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import TeacherNav from '../../components/layout/TeacherNav';
-import { class4BStudents, teacherRecentPosts, teacherPendingActions, getStudentById } from '../../data/teacherMockData';
+import { classY6Students, teacherRecentPosts, teacherPendingActions, getStudentById } from '../../data/teacherMockData';
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
@@ -9,10 +9,10 @@ export default function TeacherDashboard() {
     <div className="min-h-screen bg-gray-50">
       <TeacherNav />
 
-      <div className="max-w-4xl mx-auto px-6 py-6 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
         {/* Quick Actions */}
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           {[
             { label: 'Share Student Work', icon: '🎨', color: 'bg-purple-50 border-purple-200 text-purple-700', action: () => navigate('/teacher/post/new?type=student_work') },
             { label: 'Class Update', icon: '📝', color: 'bg-blue-50 border-blue-200 text-blue-700', action: () => navigate('/teacher/post/new?type=class_update') },
@@ -21,7 +21,7 @@ export default function TeacherDashboard() {
             <button
               key={btn.label}
               onClick={btn.action}
-              className={`flex-1 ${btn.color} border rounded-xl p-4 text-center transition-transform active:scale-[0.98] hover:shadow-sm`}
+              className={`flex-1 min-w-[100px] ${btn.color} border rounded-xl p-3 sm:p-4 text-center transition-transform active:scale-[0.98] hover:shadow-sm`}
             >
               <span className="text-2xl block mb-2">{btn.icon}</span>
               <span className="text-[13px] font-semibold">{btn.label}</span>
@@ -29,21 +29,21 @@ export default function TeacherDashboard() {
           ))}
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left: Class Roster */}
-          <div className="col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Roster Header */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-[16px] font-bold text-gray-900">4B — Jaguars</h2>
-                  <p className="text-[12px] text-gray-400">{class4BStudents.length} students</p>
+                  <h2 className="text-[16px] font-bold text-gray-900">Y6 — Jaguars</h2>
+                  <p className="text-[12px] text-gray-400">{classY6Students.length} students</p>
                 </div>
               </div>
 
               {/* Student Grid */}
-              <div className="grid grid-cols-4 gap-3">
-                {class4BStudents.map((student) => (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
+                {classY6Students.map((student) => (
                   <button
                     key={student.id}
                     onClick={() => navigate(`/teacher/student/${student.id}`)}

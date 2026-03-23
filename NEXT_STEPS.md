@@ -1,6 +1,8 @@
-# Local Backend Architecture Plan
+# Architecture Decisions & Next Steps
 
-You asked why Supabase — fair point. You have no Docker, no PostgreSQL, no cloud accounts. Let's keep it simple and fully local.
+This document records the technical decisions made when setting up the local-first backend, and tracks implementation progress.
+
+> Originally started as "why not Supabase?" — we chose SQLite + Express for zero-ops simplicity.
 
 ## Your System
 
@@ -9,8 +11,8 @@ You asked why Supabase — fair point. You have no Docker, no PostgreSQL, no clo
 | CPU | Apple M3 Pro |
 | RAM | 18 GB |
 | Docker | ❌ Not installed |
-| PostgreSQL | ❌ Not installed |
-| Ollama | ❌ Not installed (yet) |
+| PostgreSQL | ❌ Not needed (using SQLite) |
+| Ollama | ✅ Installed — `gemma3:4b` |
 
 ---
 
@@ -104,27 +106,27 @@ Everything runs on your machine. No cloud. No accounts (except Gmail App Passwor
 
 ## Implementation Steps
 
-### Phase 1: Core Backend (I do this now)
-1. Install Ollama + pull `gemma3:4b`
-2. Create Express.js server in `/server`
-3. Set up SQLite with our existing schema
-4. Seed with current mock data
-5. Wire React app to call API instead of mock data
+### Phase 1: Core Backend ✅ Complete
+1. ~~Install Ollama + pull `gemma3:4b`~~
+2. ~~Create Express.js server in `/server`~~
+3. ~~Set up SQLite with our existing schema~~
+4. ~~Seed with current mock data~~
+5. ~~Wire React app to call API instead of mock data~~
 
-### Phase 2: Email Ingestion
-6. Set up Gmail IMAP poller (you provide App Password)
-7. Parser extracts school emails → creates feed items
-8. Teacher approval flow for ingested items
+### Phase 2: Email Ingestion ✅ Complete
+6. ~~Set up Gmail IMAP poller~~
+7. ~~Parser extracts school emails → creates feed items~~
+8. Teacher approval flow for ingested items — *deferred*
 
-### Phase 3: WhatsApp Ingestion
-9. WhatsApp export parser (parses the `.txt` export format)
-10. Upload endpoint in the server
-11. UI for uploading/reviewing WhatsApp imports
+### Phase 3: WhatsApp Ingestion 🟡 Partial
+9. ~~WhatsApp export parser (parses the `.txt` export format)~~
+10. ~~Upload endpoint in the server~~
+11. UI for uploading/reviewing WhatsApp imports — *not started*
 
-### Phase 4: AI Assistant with Ollama
-12. Wire AI assistant to call Ollama via `/api/ai`
-13. System prompt with context from your children's data
-14. Search + summarize using the local model
+### Phase 4: AI Assistant ✅ Complete
+12. ~~Wire AI assistant to call Ollama via `/api/ai`~~
+13. ~~System prompt with context from your children's data~~
+14. ~~Search + summarize using the local model~~
 
 ---
 

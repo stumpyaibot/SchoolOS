@@ -38,4 +38,7 @@ npm-debug.log*
 # Server
 server/node_modules/
 server/schoolos.db
+server/schoolos.db-shm
+server/schoolos.db-wal
 server/.env
+server/uploads/

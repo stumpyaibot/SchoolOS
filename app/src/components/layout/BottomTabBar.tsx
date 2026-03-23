@@ -1,10 +1,9 @@
 import { NavLink } from 'react-router-dom';
-import { House, BookOpen, CalendarDays, MessageCircle, Sparkles } from 'lucide-react';
+import { House, CalendarDays, MessageCircle, Sparkles } from 'lucide-react';
 import { getTotalUnreadCount } from '../../data/mockData';
 
 const tabs = [
   { to: '/home', label: 'Home', Icon: House },
-  { to: '/class/stu_emma', label: 'Class', Icon: BookOpen },
   { to: '/calendar', label: 'Calendar', Icon: CalendarDays },
   { to: '/messages', label: 'Messages', Icon: MessageCircle },
   { to: '/ai', label: 'AI', Icon: Sparkles },

@@ -87,9 +87,11 @@ async function checkForNewEmails({ rescan = false } = {}) {
     connection = await imapSimple.connect(IMAP_CONFIG);
     await connection.openBox('INBOX');
 
-    // Rescan mode: search ALL emails from today; normal mode: UNSEEN only
+    // Rescan mode: search ALL emails from past 7 days; normal mode: UNSEEN only
+    const sinceDate = new Date();
+    sinceDate.setDate(sinceDate.getDate() - 7);
     const searchCriteria = rescan
-      ? [['SINCE', new Date().toISOString().split('T')[0]]]
+      ? [['SINCE', sinceDate.toISOString().split('T')[0]]]
       : ['UNSEEN'];
     const fetchOptions = {
       bodies: [''],
@@ -179,14 +181,21 @@ async function checkForNewEmails({ rescan = false } = {}) {
           : aiParsed.actionType === 'acknowledgement' ? 'Noted'
           : aiParsed.actionType ? 'View' : null;
 
+        // Store AI-summarised content as `content`, and original cleaned body as `full_content`
+        // so the detail page can show both the summary and the full email text
+        const fullContent = textBody && textBody.length > (aiParsed.content || '').length ? textBody : null;
+
         db.prepare(`
-          INSERT INTO feed_items (id, type, author_id, title, content, media_urls, priority, school_wide,
+          INSERT INTO feed_items (id, type, author_id, title, content, full_content, media_urls, priority, school_wide,
             target_class_ids, target_student_ids, action_type, action_due_date, action_button_label, 
+            bullet_summary,
             original_source, ingestion_status, created_at)
-          VALUES (?, 'ingested_email', 'u_admin', ?, ?, ?, ?, 1, '[]', '[]', ?, ?, ?, ?, 'approved', datetime('now'))
+          VALUES (?, 'ingested_email', 'u_admin', ?, ?, ?, ?, ?, 1, '[]', '[]', ?, ?, ?, ?, ?, 'approved', datetime('now'))
         `).run(feedId, aiParsed.title || subject, aiParsed.content || textBody.slice(0, 2000),
+          fullContent,
           JSON.stringify(mediaUrls), aiParsed.priority || 'normal',
           aiParsed.actionType || null, aiParsed.actionDueDate || null, actionLabel,
+          aiParsed.bulletSummary ? JSON.stringify(aiParsed.bulletSummary) : null,
           `Email from ${from}`);
 
         console.log(`✅ Published to feed: ${feedId} — "${aiParsed.title || subject}" [${aiParsed.priority}] ${mediaUrls.length ? `🖼️ ${mediaUrls.length}` : ''}`);

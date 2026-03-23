@@ -312,6 +312,8 @@ function mapFeedItem(row, reactions, currentUserId) {
     timestamp: row.created_at,
     title: row.title,
     content: row.content,
+    fullContent: row.full_content || null,
+    bulletSummary: safeJsonParse(row.bullet_summary, null),
     mediaUrls: safeJsonParse(row.media_urls, []),
     priority: row.priority,
     reactions: Object.values(reactionMap),

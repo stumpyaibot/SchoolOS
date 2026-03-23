@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import BackHeader from '../components/layout/BackHeader';
 import { getUserById, getStudentById } from '../data/mockData';
 import { getFeedItemById } from '../lib/dataAccess';
@@ -11,6 +11,8 @@ export default function PostDetail() {
   const [loading, setLoading] = useState(true);
   const [reactions, setReactions] = useState<Reaction[]>([]);
   const [showFull, setShowFull] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (postId) {
@@ -62,16 +64,62 @@ export default function PostDetail() {
   };
 
   const AVAILABLE_REACTIONS = ['❤️', '👏', '🌟'];
+  const hasMultipleImages = item.mediaUrls && item.mediaUrls.length > 1;
+  const hasSingleImage = item.mediaUrls && item.mediaUrls.length === 1;
+  const hasImages = item.mediaUrls && item.mediaUrls.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <BackHeader title="Post" />
 
       <div className="px-2.5 pt-2 space-y-2">
-        {/* Hero Image */}
-        {item.mediaUrls && item.mediaUrls.length > 0 && (
-          <div className="rounded-lg overflow-hidden">
-            <img src={item.mediaUrls[0]} alt="" className="w-full h-48 object-cover" />
+        {/* ===== Photo Section ===== */}
+
+        {/* Single image: hero display */}
+        {hasSingleImage && (
+          <button
+            onClick={() => setLightboxIndex(0)}
+            className="w-full rounded-lg overflow-hidden active:opacity-90 transition-opacity"
+          >
+            <img src={item.mediaUrls![0]} alt="" className="w-full h-48 object-cover" />
+          </button>
+        )}
+
+        {/* Multiple images: scrollable strip */}
+        {hasMultipleImages && (
+          <div>
+            <p className="text-[11px] text-gray-400 mb-1.5 px-0.5">📸 {item.mediaUrls!.length} photos</p>
+            <div
+              ref={scrollRef}
+              className="flex gap-1.5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-1"
+              style={{ scrollSnapType: 'x mandatory' }}
+            >
+              {item.mediaUrls!.map((url, i) => (
+                <button
+                  key={i}
+                  onClick={() => setLightboxIndex(i)}
+                  className="shrink-0 snap-start rounded-lg overflow-hidden active:scale-[0.97] transition-transform"
+                  style={{ width: item.mediaUrls!.length === 2 ? 'calc(50% - 3px)' : '70%' }}
+                >
+                  <img
+                    src={url}
+                    alt={`Photo ${i + 1}`}
+                    className="w-full h-48 object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+            {/* Dot indicators */}
+            <div className="flex justify-center gap-1 mt-1.5">
+              {item.mediaUrls!.map((_, i) => (
+                <span
+                  key={i}
+                  className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                    lightboxIndex === i ? 'bg-blue-500' : 'bg-gray-300'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         )}
 
@@ -113,7 +161,7 @@ export default function PostDetail() {
                     onClick={() => setShowFull(!showFull)}
                     className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-[13px] font-semibold transition-all active:scale-[0.98]"
                   >
-                    <span>{showFull ? '▲  Hide Full Newsletter' : '▼  Read Full Newsletter'}</span>
+                    <span>{showFull ? '▲  Hide Full Text' : '▼  Read Full Text'}</span>
                   </button>
                   {showFull && (
                     <div className="mt-3 pt-3 border-t border-gray-100">
@@ -153,6 +201,86 @@ export default function PostDetail() {
           </div>
         </div>
       </div>
+
+      {/* ===== Lightbox — Full-Screen Photo Viewer ===== */}
+      {lightboxIndex !== null && hasImages && (
+        <div
+          className="fixed inset-0 bg-black/95 z-50 flex flex-col"
+          onClick={() => setLightboxIndex(null)}
+        >
+          {/* Close + counter */}
+          <div className="flex items-center justify-between p-4">
+            <span className="text-white/70 text-[13px] font-medium">
+              {lightboxIndex + 1} / {item.mediaUrls!.length}
+            </span>
+            <button
+              onClick={() => setLightboxIndex(null)}
+              className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white text-xl hover:bg-white/25 transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Main image */}
+          <div className="flex-1 flex items-center justify-center px-4 relative">
+            {/* Prev button */}
+            {lightboxIndex > 0 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1); }}
+                className="absolute left-2 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white text-lg hover:bg-white/25 transition-colors z-10"
+              >
+                ‹
+              </button>
+            )}
+
+            <img
+              src={item.mediaUrls![lightboxIndex]}
+              alt={`Photo ${lightboxIndex + 1}`}
+              className="max-w-full max-h-[75vh] rounded-lg object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+
+            {/* Next button */}
+            {lightboxIndex < item.mediaUrls!.length - 1 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1); }}
+                className="absolute right-2 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white text-lg hover:bg-white/25 transition-colors z-10"
+              >
+                ›
+              </button>
+            )}
+          </div>
+
+          {/* Thumbnail strip */}
+          {item.mediaUrls!.length > 1 && (
+            <div className="flex justify-center gap-2 p-4">
+              {item.mediaUrls!.map((url, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => { e.stopPropagation(); setLightboxIndex(i); }}
+                  className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${
+                    i === lightboxIndex ? 'border-white opacity-100' : 'border-transparent opacity-50 hover:opacity-75'
+                  }`}
+                >
+                  <img src={url} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Download */}
+          <div className="flex justify-center pb-6">
+            <a
+              href={item.mediaUrls![lightboxIndex]}
+              download
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white/15 text-white rounded-full px-5 py-2.5 text-[13px] font-medium hover:bg-white/25 transition-colors backdrop-blur-sm"
+            >
+              ⬇ Download Full Size
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

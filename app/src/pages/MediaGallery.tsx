@@ -1,21 +1,33 @@
 import { useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BackHeader from '../components/layout/BackHeader';
-import { feedItems, getStudentById } from '../data/mockData';
+import { getStudentById } from '../data/mockData';
+import { getFeedItems } from '../lib/dataAccess';
+import type { FeedItem } from '../types';
 
 export default function MediaGallery() {
   const { childId } = useParams<{ childId: string }>();
   const child = childId ? getStudentById(childId) : null;
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [allFeedItems, setAllFeedItems] = useState<FeedItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getFeedItems().then(items => {
+      setAllFeedItems(items);
+      setLoading(false);
+    });
+  }, []);
 
   // Collect all media from feed items relevant to this child
-  const mediaItems = feedItems
+  const mediaItems = allFeedItems
     .filter(item => {
       if (!childId) return item.mediaUrls && item.mediaUrls.length > 0;
       return (
         (item.mediaUrls && item.mediaUrls.length > 0) &&
         (item.targetAudiences.studentIds?.includes(childId) ||
-         item.targetAudiences.classIds?.includes(child?.classId || ''))
+         item.targetAudiences.classIds?.includes(child?.classId || '') ||
+         item.targetAudiences.schoolWide)
       );
     })
     .flatMap(item =>
@@ -32,7 +44,11 @@ export default function MediaGallery() {
       <BackHeader title={child ? `${child.firstName}'s Gallery` : 'Gallery'} />
 
       <div className="px-2.5 pt-2 pb-20">
-        {mediaItems.length === 0 ? (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <p className="text-[14px] text-gray-400">Loading photos…</p>
+          </div>
+        ) : mediaItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <span className="text-4xl mb-3">📸</span>
             <p className="text-[14px] font-semibold text-gray-500">No photos yet</p>

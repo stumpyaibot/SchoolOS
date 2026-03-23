@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
-import { students, getUserById, getStudentById, getClassById } from '../data/mockData';
+import { students, getUserById, getStudentById } from '../data/mockData';
 import { getFeedItems, getTodayDigest } from '../lib/dataAccess';
 import type { FeedItem } from '../types';
 
@@ -24,23 +24,27 @@ function childColor(childId: string | null): { text: string; bg: string; border:
   return { text: 'text-gray-500', bg: 'bg-gray-50', border: 'border-gray-300', dot: 'bg-gray-400' };
 }
 
-function typeLabel(item: FeedItem): string {
-  switch (item.type) {
-    case 'teacher_post': return 'CLASS UPDATE';
-    case 'admin_announcement': return 'ADMIN';
-    case 'ingested_whatsapp': return 'VIA WHATSAPP';
-    case 'ingested_email': return 'VIA EMAIL';
-    case 'student_work': return 'STUDENT WORK';
+/* ===== Child name for card header ===== */
+function childName(item: FeedItem): string {
+  if (item.targetAudiences.schoolWide) return 'Whole School';
+  if (item.targetAudiences.studentIds) {
+    const s = getStudentById(item.targetAudiences.studentIds[0]);
+    if (s) return s.firstName;
   }
+  if (item.targetAudiences.classIds) {
+    const child = students.find(s => s.classId === item.targetAudiences.classIds![0]);
+    if (child) return child.firstName;
+  }
+  return 'Update';
 }
 
-function typeIcon(item: FeedItem): string {
+function typeDescriptor(item: FeedItem): string {
   switch (item.type) {
-    case 'teacher_post': return '📝';
-    case 'admin_announcement': return '📢';
-    case 'ingested_whatsapp': return '💬';
-    case 'ingested_email': return '📧';
-    case 'student_work': return '🎨';
+    case 'teacher_post': return 'class update';
+    case 'admin_announcement': return 'announcement';
+    case 'ingested_whatsapp': return 'via whatsapp';
+    case 'ingested_email': return 'via email';
+    case 'student_work': return 'student work';
   }
 }
 
@@ -48,25 +52,9 @@ function timeAgo(timestamp: string): string {
   const diff = Date.now() - new Date(timestamp).getTime();
   const hours = Math.floor(diff / (1000 * 60 * 60));
   if (hours < 1) return 'Just now';
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return `${hours}h`;
   const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
-function childTagLabel(item: FeedItem): string {
-  if (item.targetAudiences.schoolWide) return 'WHOLE SCHOOL';
-  if (item.targetAudiences.studentIds) {
-    const s = getStudentById(item.targetAudiences.studentIds[0]);
-    return s ? `${s.firstName.toUpperCase()} • ${s.gradeStr.toUpperCase()}` : '';
-  }
-  if (item.targetAudiences.classIds) {
-    const classId = item.targetAudiences.classIds[0];
-    const child = students.find(s => s.classId === classId);
-    if (child) return `${child.firstName.toUpperCase()} • ${child.gradeStr.toUpperCase()}`;
-    const cls = getClassById(classId);
-    return cls ? cls.name.toUpperCase() : '';
-  }
-  return '';
+  return `${days}d`;
 }
 
 function isItemForChild(item: FeedItem, childId: string): boolean {
@@ -81,17 +69,11 @@ export default function HomeFeed() {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  // Fetch feed items from API (with mock fallback)
   useEffect(() => {
-    getFeedItems().then(items => {
-      setFeedItems(items);
-      setLoading(false);
-    });
+    getFeedItems().then(setFeedItems);
   }, []);
 
-  // Digest still from mock (will be AI-generated later)
   const todayDigest = getTodayDigest();
 
   const urgentItems = feedItems.filter(i => i.priority === 'urgent' && i.actionItem);
@@ -107,7 +89,7 @@ export default function HomeFeed() {
     <div className="pb-16">
       <Header title="SchoolOS" />
 
-      <div className="px-2.5 pt-2 space-y-3">
+      <div className="px-3 pt-2 space-y-3">
         {/* Urgent Banner */}
         {urgentItems
           .filter(item => activeFilter === 'all' || isItemForChild(item, activeFilter))
@@ -115,7 +97,7 @@ export default function HomeFeed() {
           <button
             key={item.id}
             onClick={() => navigate(`/action/${item.id}`)}
-            className="w-full bg-red-50 border border-red-200 rounded-lg p-2.5 flex items-start gap-2.5 text-left transition-transform active:scale-[0.98]"
+            className="w-full bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-2.5 text-left transition-transform active:scale-[0.98]"
           >
             <span className="text-red-600 text-lg mt-0.5">⚠️</span>
             <div className="flex-1 min-w-0">
@@ -133,10 +115,10 @@ export default function HomeFeed() {
         {filteredDigest.length > 0 && (
           <button
             onClick={() => navigate('/ai')}
-            className="w-full bg-white rounded-lg border border-gray-200 p-3 text-left transition-transform active:scale-[0.98]"
+            className="w-full bg-white rounded-xl p-3 text-left transition-transform active:scale-[0.98] shadow-sm"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Morning Digest • AI</span>
+              <span className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Today's Update • AI</span>
               <span className="text-[11px] text-gray-400">Today</span>
             </div>
             <div className="space-y-1.5">
@@ -145,9 +127,9 @@ export default function HomeFeed() {
                 const colors = childColor(d.childId ?? null);
                 return (
                   <div key={i} className="flex items-start gap-2">
-                    <span className={`w-2 h-2 rounded-full ${colors.dot} mt-1.5 shrink-0`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${colors.dot} mt-[7px] shrink-0`} />
                     <p className="text-[13px] text-gray-700 leading-snug">
-                      <span className={`font-semibold uppercase text-[10px] ${colors.text}`}>{child?.firstName ?? 'ALL'}</span>
+                      <span className={`font-semibold text-[10px] uppercase ${colors.text}`}>{child?.firstName ?? 'ALL'}</span>
                       <span className="text-gray-300 mx-1">·</span>
                       {d.summary}
                     </p>
@@ -159,7 +141,7 @@ export default function HomeFeed() {
         )}
 
         {/* ===== Child Filter Chips ===== */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+        <div className="flex gap-2 justify-center overflow-x-auto no-scrollbar py-0.5">
           <button
             onClick={() => setActiveFilter('all')}
             className={`rounded-full px-4 py-1.5 text-[13px] font-medium whitespace-nowrap shrink-0 transition-colors ${
@@ -184,67 +166,73 @@ export default function HomeFeed() {
                 }`}
                 style={{ opacity: isActive ? 1 : 0.7 }}
               >
-                {s.firstName} — {s.gradeStr}
+                {s.firstName}
               </button>
             );
           })}
         </div>
 
-        {/* ===== Feed Cards ===== */}
+        {/* ===== Feed Cards — Minimal "Digital Concierge" Layout ===== */}
         {sortedFeed.map((item) => {
           const author = getUserById(item.authorId);
           const route = item.actionItem ? `/action/${item.id}` : `/post/${item.id}`;
           const itemChildId = getChildIdForItem(item);
           const colors = childColor(itemChildId);
+          const isTeacherPost = item.type === 'teacher_post' || item.type === 'student_work';
+          const hasReactions = item.reactions && item.reactions.length > 0;
 
           return (
             <button
               key={item.id}
               onClick={() => navigate(route)}
-              className="w-full bg-white rounded-lg border border-gray-200 text-left block transition-transform active:scale-[0.98]"
+              className="w-full bg-white rounded-xl text-left block transition-transform active:scale-[0.98] shadow-sm"
             >
-              {/* Card Header — Pill Badges */}
-              <div className="px-2.5 pt-2.5 pb-0.5 flex justify-between items-center">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  {/* Source type pill */}
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-[9px] font-bold text-gray-500 uppercase tracking-wide">
-                    {typeIcon(item)} {typeLabel(item)}
-                  </span>
-                  {/* Child/audience pill */}
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${colors.bg} border ${colors.border} text-[9px] font-bold ${colors.text} uppercase tracking-wide`}>
-                    {childTagLabel(item)}
-                  </span>
+              <div className="p-3">
+                {/* Header: dot + child name + reactions + time */}
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className={`w-1.5 h-1.5 rounded-full ${colors.dot} shrink-0`} />
+                    <span className={`text-[12px] font-semibold ${colors.text}`}>{childName(item)}</span>
+                    <span className="text-gray-300">·</span>
+                    <span className="text-[11px] text-gray-400">{typeDescriptor(item)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {hasReactions && item.reactions!.map((r, i) => (
+                      <span key={i} className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium ${r.userReacted ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-500'}`}>
+                        {r.type} {r.count}
+                      </span>
+                    ))}
+                    <span className="text-[11px] text-gray-400">{timeAgo(item.timestamp)}</span>
+                  </div>
                 </div>
-                <span className="text-[11px] text-gray-400 shrink-0 ml-2">{timeAgo(item.timestamp)}</span>
-              </div>
 
-              {/* Card Body */}
-              <div className="px-2.5 pb-2.5">
-                <h3 className="text-[14px] font-semibold text-gray-900 mb-0.5">{item.title}</h3>
-                {item.bulletSummary ? (
-                  <ul className="space-y-0.5">
-                    {item.bulletSummary.slice(0, 3).map((b, i) => (
-                      <li key={i} className="flex items-start gap-1.5 text-[12px] text-gray-600 leading-snug">
+                {/* Title */}
+                <h3 className="text-[15px] font-semibold text-gray-900 leading-snug">{item.title}</h3>
+
+                {/* Content — format depends on what's appropriate */}
+                {item.bulletSummary && item.bulletSummary.length === 1 ? (
+                  <p className="text-[13px] text-gray-500 leading-snug mt-0.5">{item.bulletSummary[0]}</p>
+                ) : item.bulletSummary && item.bulletSummary.length > 1 ? (
+                  <ul className="mt-1 space-y-0.5">
+                    {item.bulletSummary.map((b, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-[12px] text-gray-500 leading-snug">
                         <span className="text-blue-400 mt-px shrink-0">•</span>
                         <span>{b}</span>
                       </li>
                     ))}
-                    {item.bulletSummary.length > 3 && (
-                      <li className="text-[11px] text-blue-600 font-medium pl-4">+{item.bulletSummary.length - 3} more…</li>
-                    )}
                   </ul>
                 ) : item.summary ? (
-                  <p className="text-[12px] text-gray-500 leading-snug">{item.summary}</p>
+                  <p className="text-[13px] text-gray-500 leading-snug mt-0.5">{item.summary}</p>
                 ) : null}
 
-                {/* Media Preview — 16:9 aspect ratio */}
+                {/* Media Preview */}
                 {item.mediaUrls && item.mediaUrls.length > 0 && (
                   <div className="mt-2 rounded-lg overflow-hidden" style={{ aspectRatio: '16/9' }}>
                     <img src={item.mediaUrls[0]} alt="" className="w-full h-full object-cover" />
                   </div>
                 )}
 
-                {/* Action Button — only for real actions (not acknowledgements) */}
+                {/* Action Button — only for signature_required */}
                 {item.actionItem && !item.actionItem.isCompleted && item.actionItem.type !== 'acknowledgement' && (
                   <div className="mt-2">
                     <span className="block w-full text-center bg-blue-600 text-white rounded-lg py-2 text-[13px] font-bold">
@@ -253,24 +241,10 @@ export default function HomeFeed() {
                   </div>
                 )}
 
-                {/* Reactions + Author — single row */}
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="flex gap-2">
-                    {item.reactions && item.reactions.map((r, i) => (
-                      <span key={i} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${r.userReacted ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-gray-50 text-gray-600 border border-gray-200'}`}>
-                        {r.type} {r.count}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-[8px] font-bold text-gray-500">
-                      {author ? author.firstName[0] + author.lastName[0] : '?'}
-                    </span>
-                    <span className="text-[10px] text-gray-400">
-                      {author ? `${author.firstName} ${author.lastName}` : 'SchoolOS'}
-                    </span>
-                  </div>
-                </div>
+                {/* Author — only on teacher/student work posts */}
+                {isTeacherPost && author && (
+                  <p className="mt-1.5 text-[10px] text-gray-400 text-right">{author.firstName} {author.lastName}</p>
+                )}
               </div>
             </button>
           );

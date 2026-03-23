@@ -1,26 +1,22 @@
-# SchoolOS Project Execution Plan
+# Feed Quality Fixes — AI Parser, Photo Gallery, Full-Content
 
-## Phase 1: Planning & Design System (Current)
-- [x] Analyze mockups to extract core design tokens.
-- [x] Create Design System single-source-of-truth (`design_system.md`).
-- [x] Draft Data Model/JSON Schema (`mock_data_schema.md`).
-- [ ] User review and approval of the Design System & Schema.
-- [x] Finalize & Tighten PRD (product_spec.md).
-- [ ] Initialize React/Vite/Tailwind frontend project.
+## Fix 1: AI Parser Root Cause
+- [ ] Use Ollama `system` param instead of inlining system prompt in `prompt`
+- [ ] Add `format: "json"` to force JSON output mode
+- [ ] Add response validation (must contain `title` field)
+- [ ] Test with `curl` to verify AI returns proper parsed fields
 
-## Phase 2: Frontend Foundation
-- [ ] Initialize project repository.
-- [ ] Configure Tailwind CSS exactly to the Design System tokens.
-- [ ] Create base UI component library (Standard Card, Filter Chips, Action Banners, Navigation).
+## Fix 2: Full-Content Click-Through
+- [ ] Add `full_content` column to `feed_items` table (migration in `db.js`)
+- [ ] Store original cleaned email body as `full_content` in `emailPoller.js`
+- [ ] Map `fullContent` in `mapFeedItem` in `index.js`
+- [ ] Verify "Read Full Newsletter" expand works on ingested emails
 
-## Phase 3: Screen Assembly
-- [ ] Build Home Feed (Unified Feed).
-- [ ] Build Class View (Updates & Student Work).
-- [ ] Build Action Items (Task Manager).
-- [ ] Build Messages (Teacher Chat & Inbox Overview).
-- [ ] Build Calendar (Month & Booking View).
+## Fix 3: Multi-Photo Gallery on Post Detail
+- [ ] Replace single hero image with scrollable photo strip + lightbox
+- [ ] Add swipe navigation in lightbox
+- [ ] Show photo count badge
+- [ ] Fix `MediaGallery.tsx` to use API data instead of static mock data
 
-## Phase 4: AI Mocking & Logic
-- [ ] Implement simulated AI ingestion logic for mock emails/WhatsApps.
-- [ ] Build the interactive Parent AI Assistant Chatbot UI.
-- [ ] Connect screens with interactive routing.
+## Housekeeping
+- [ ] Update `lessons.md` with Ollama system/prompt lesson

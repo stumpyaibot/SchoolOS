@@ -82,6 +82,7 @@ db.exec(`
     action_due_date TEXT,
     action_button_label TEXT,
     action_is_completed INTEGER DEFAULT 0,
+    bullet_summary TEXT,
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
   );
@@ -175,5 +176,13 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_reactions_feed_item ON reactions(feed_item_id);
   CREATE INDEX IF NOT EXISTS idx_calendar_events_start ON calendar_events(start_time);
 `);
+
+// Migration: add full_content column if it doesn't exist
+try {
+  db.exec(`ALTER TABLE feed_items ADD COLUMN full_content TEXT`);
+  console.log('📦 Migration: added full_content column to feed_items');
+} catch {
+  // Column already exists — ignore
+}
 
 export default db;
